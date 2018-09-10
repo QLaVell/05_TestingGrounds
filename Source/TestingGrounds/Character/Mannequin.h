@@ -30,7 +30,7 @@ public:
 	TSubclassOf<class AGun> GunBluprint;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void Fire();
+	void PullTrigger();
 	
 private:
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
