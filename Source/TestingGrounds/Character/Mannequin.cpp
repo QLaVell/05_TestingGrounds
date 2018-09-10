@@ -25,7 +25,7 @@ AMannequin::AMannequin()
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
 	Mesh1P->RelativeLocation = FVector(3.293318, -4.998758, -161.327179);
-	Mesh1P->RelativeRotation = FRotator(1.900000, -19.190001, 5.200000);
+	Mesh1P->RelativeRotation = FRotator(1.9, -19.19, 5.2);
 
 }
 
@@ -41,7 +41,8 @@ void AMannequin::BeginPlay()
 
 	Gun = GetWorld()->SpawnActor<AGun>(GunBluprint);
 	Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint")); // Attach gun mesh to grip point
-	Gun->AnimInstance = Mesh1P->GetAnimInstance();
+	Gun->FPAnimInstance = Mesh1P->GetAnimInstance();
+	Gun->TPAnimInstance = GetMesh()->GetAnimInstance();
 
 	if (InputComponent != NULL) {
 		InputComponent->BindAction("Fire", IE_Pressed, this, &AMannequin::PullTrigger);
