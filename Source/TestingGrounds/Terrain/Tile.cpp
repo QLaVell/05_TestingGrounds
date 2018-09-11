@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Tile.h"
+#include "Engine/World.h"
+#include "DrawDebugHelpers.h"
 
 
 // Sets default values
@@ -18,7 +20,7 @@ void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawn, int MaxSpawn)
 	int NumberToSpawn = FMath::RandRange(MinSpawn, MaxSpawn);
 	for (size_t i = 0; i < NumberToSpawn; i++) {
 		FVector SpawnPoint = FMath::RandPointInBox(Bounds);
-		AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn);
+		AActor* Spawned = GetWorld()->SpawnActor<AActor>();
 		Spawned->SetActorRelativeLocation(SpawnPoint);
 		Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 	}
@@ -29,6 +31,8 @@ void ATile::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	CastSphere(GetActorLocation(), 300);
+	CastSphere(GetActorLocation() + FVector(0, 0, 1000), 300);
 }
 
 // Called every frame
@@ -36,4 +40,19 @@ void ATile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+bool ATile::CastSphere(FVector Location, float Radius) {
+	FHitResult HitResult;
+	bool bHasHit = GetWorld()->SweepSingleByChannel(
+		HitResult,
+		Location,
+		Location,
+		FQuat::Identity,
+		ECollisionChannel::ECC_Camera,
+		FCollisionShape::MakeSphere(Radius)
+	);
+	FColor ResultColor = bHasHit ? FColor::Red : FColor::Green;
+	DrawDebugSphere(GetWorld(), Location, Radius, 100, ResultColor, true);
+	return bHasHit;
 }
