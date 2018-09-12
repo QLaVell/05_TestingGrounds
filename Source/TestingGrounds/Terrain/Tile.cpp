@@ -20,7 +20,7 @@ void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawn, int MaxSpawn)
 	int NumberToSpawn = FMath::RandRange(MinSpawn, MaxSpawn);
 	for (size_t i = 0; i < NumberToSpawn; i++) {
 		FVector SpawnPoint = FMath::RandPointInBox(Bounds);
-		AActor* Spawned = GetWorld()->SpawnActor<AActor>();
+		AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn);
 		Spawned->SetActorRelativeLocation(SpawnPoint);
 		Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 	}
@@ -49,10 +49,10 @@ bool ATile::CastSphere(FVector Location, float Radius) {
 		Location,
 		Location,
 		FQuat::Identity,
-		ECollisionChannel::ECC_Camera,
+		ECollisionChannel::ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(Radius)
 	);
 	FColor ResultColor = bHasHit ? FColor::Red : FColor::Green;
-	DrawDebugSphere(GetWorld(), Location, Radius, 100, ResultColor, true);
+	DrawDebugCapsule(GetWorld(), Location, 0, Radius, FQuat::Identity, ResultColor, true);
 	return bHasHit;
 }
