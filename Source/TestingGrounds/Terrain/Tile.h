@@ -17,7 +17,27 @@ struct FSpawnPosition {
 };
 
 USTRUCT(BlueprintType)
-struct FSpawnParams {
+struct FAISpawnParams {
+	GENERATED_USTRUCT_BODY()
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Params")
+		int MinSpawn;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Params")
+		int MaxSpawn;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Params")
+		float Radius;
+
+	FAISpawnParams() {
+		MinSpawn = 1;
+		MaxSpawn = 1;
+		Radius = 500;
+	}
+};
+
+USTRUCT(BlueprintType)
+struct FObjectSpawnParams {
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Params")
@@ -35,10 +55,18 @@ struct FSpawnParams {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Params")
 	float MaxScale;
 
-	FSpawnParams() {
+	FObjectSpawnParams() {
 		MinSpawn = 1;
 		MaxSpawn = 1;
 		Radius = 500;
+		MinScale = 1.0f;
+		MaxScale = 1.0f;
+	}
+
+	FObjectSpawnParams(FAISpawnParams SpawnParams) {
+		MinSpawn = SpawnParams.MinSpawn;
+		MaxSpawn = SpawnParams.MaxSpawn;
+		Radius = SpawnParams.Radius;
 		MinScale = 1.0f;
 		MaxScale = 1.0f;
 	}
@@ -75,18 +103,23 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Setup")
-	void PlaceActors(TSubclassOf<AActor> ToSpawn, FSpawnParams SpawnParams);
+	void PlaceActors(TSubclassOf<AActor> ToSpawn, FObjectSpawnParams SpawnParams);
+
+	UFUNCTION(BlueprintCallable, Category = "Setup")
+	void PlaceAIPawns(TSubclassOf<APawn> ToSpawn, FAISpawnParams SpawnParams);
 
 	UFUNCTION(BlueprintCallable, Category = "Pool")
 	void SetPool(UActorPool* InPool);
 
 	
 private:
-	TArray<FSpawnPosition> RandomSpawnPositions(FSpawnParams SpawnParams);
+	TArray<FSpawnPosition> RandomSpawnPositions(FObjectSpawnParams SpawnParams);
 
 	bool FindEmptyLocation(FVector& OutLocation, float Radius);
 
 	void PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition& SpawnPosition);
+
+	void PlaceAIPawn(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition);
 
 	bool CanSpawnAtLocation(FVector Location, float Radius);
 

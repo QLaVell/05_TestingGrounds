@@ -37,14 +37,21 @@ void ATile::PositionNavMeshBoundsVolume() {
 	GetWorld()->GetNavigationSystem()->Build();
 }
 
-void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, FSpawnParams SpawnParams) {
+void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, FObjectSpawnParams SpawnParams) {
 	TArray<FSpawnPosition> SpawnPositions = RandomSpawnPositions(SpawnParams);
 	for (FSpawnPosition SpawnPosition : SpawnPositions) {
 		PlaceActor(ToSpawn, SpawnPosition);
 	}
 }
 
-TArray<FSpawnPosition> ATile::RandomSpawnPositions(FSpawnParams SpawnParams) {
+void ATile::PlaceAIPawns(TSubclassOf<APawn> ToSpawn, FAISpawnParams SpawnParams) {
+	TArray<FSpawnPosition> SpawnPositions = RandomSpawnPositions(FObjectSpawnParams(SpawnParams));
+	for (FSpawnPosition SpawnPosition : SpawnPositions) {
+		PlaceAIPawn(ToSpawn, SpawnPosition);
+	}
+}
+
+TArray<FSpawnPosition> ATile::RandomSpawnPositions(FObjectSpawnParams SpawnParams) {
 	TArray<FSpawnPosition> SpawnPositions;
 
 	int NumberToSpawn = FMath::RandRange(SpawnParams.MinSpawn, SpawnParams.MaxSpawn);
@@ -80,6 +87,15 @@ void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition& SpawnPositio
 	Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 	Spawned->SetActorRotation(FRotator(0, SpawnPosition.YawRotation, 0));
 	Spawned->SetActorScale3D(FVector(SpawnPosition.Scale));
+}
+
+void ATile::PlaceAIPawn(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition) {
+	APawn* Spawned = GetWorld()->SpawnActor<APawn>(ToSpawn);
+	Spawned->SpawnDefaultController();
+	Spawned->Tags.Add(FName("Enemy"));
+	Spawned->SetActorRelativeLocation(SpawnPosition.Location);
+	Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+	Spawned->SetActorRotation(FRotator(0, SpawnPosition.YawRotation, 0));
 }
 
 // Called when the game starts or when spawned
