@@ -6,6 +6,44 @@
 #include "GameFramework/Actor.h"
 #include "Tile.generated.h"
 
+
+USTRUCT()
+struct FSpawnPosition {
+	GENERATED_USTRUCT_BODY()
+
+	FVector Location;
+	float YawRotation;
+	float Scale;
+};
+
+USTRUCT(BlueprintType)
+struct FSpawnParams {
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Params")
+	int MinSpawn;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Params")
+	int MaxSpawn;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Params")
+	float Radius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Params")
+	float MinScale;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Params")
+	float MaxScale;
+
+	FSpawnParams() {
+		MinSpawn = 1;
+		MaxSpawn = 1;
+		Radius = 500;
+		MinScale = 1.0f;
+		MaxScale = 1.0f;
+	}
+};
+
 class UActorPool;
 
 UCLASS()
@@ -37,16 +75,18 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Setup")
-	void PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawn = 1, int MaxSpawn = 1, float Radius = 500, float MinScale = 1, float MaxScale = 1);
+	void PlaceActors(TSubclassOf<AActor> ToSpawn, FSpawnParams SpawnParams);
 
 	UFUNCTION(BlueprintCallable, Category = "Pool")
 	void SetPool(UActorPool* InPool);
 
 	
 private:
+	TArray<FSpawnPosition> RandomSpawnPositions(FSpawnParams SpawnParams);
+
 	bool FindEmptyLocation(FVector& OutLocation, float Radius);
 
-	void PlaceActor(TSubclassOf<AActor> ToSpawn, FVector SpawnPoint, float YawRotation, float Scale);
+	void PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition& SpawnPosition);
 
 	bool CanSpawnAtLocation(FVector Location, float Radius);
 
