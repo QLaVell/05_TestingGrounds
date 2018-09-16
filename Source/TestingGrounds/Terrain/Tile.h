@@ -20,14 +20,14 @@ USTRUCT(BlueprintType)
 struct FAISpawnParams {
 	GENERATED_USTRUCT_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Params")
-		int MinSpawn;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Params")
+	int MinSpawn;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Params")
-		int MaxSpawn;
+	int MaxSpawn;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Params")
-		float Radius;
+	float Radius;
 
 	FAISpawnParams() {
 		MinSpawn = 1;
@@ -113,13 +113,14 @@ public:
 
 	
 private:
-	TArray<FSpawnPosition> RandomSpawnPositions(FObjectSpawnParams SpawnParams);
-
 	bool FindEmptyLocation(FVector& OutLocation, float Radius);
+
+	template<class T>
+	void RandomlyPlaceActors(TSubclassOf<T> ToSpawn, FObjectSpawnParams SpawnParams);
 
 	void PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition& SpawnPosition);
 
-	void PlaceAIPawn(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition);
+	void PlaceActor(TSubclassOf<APawn> ToSpawn, FSpawnPosition& SpawnPosition);
 
 	bool CanSpawnAtLocation(FVector Location, float Radius);
 
